@@ -1,0 +1,59 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+#¡Juguemos al Ahorcado! 
+
+#1. Antes de empezar, guardá el Excel en la misma carpeta en la que vayas a ejecutar el código de R. 
+#No le cambies el nombre al archivo. 
+
+#2. Ahora abrí RStudio y asegurate de tener instalada la librería readxl y svDialogs, lo podés hacer #anteponiendo al código el comando: install.packages("readxl") y install.packages("svDialogs") 
+
+library(readxl)
+library(stringr)
+library(svDialogs)
+juego <- read_xlsx("Ahorcado en RStudio.xlsx")
+palabra <- sample(juego$Listado, 1)
+
+# A modo de pista, inicializamos la variable 'adivinar' donde cada letra de la palabra se representa con un guion bajo
+adivinar <- rep("_", nchar(palabra))
+
+#Comenzamos el juego y definimos la cantidad de intentos que tendrá el jugador
+print("Adiviná la siguiente palabra:")
+cantidad_de_intentos <- 7
+
+while (cantidad_de_intentos > 0) {
+  cat("Palabra a adivinar: ", paste(adivinar, collapse = " "), "\n")
+  intento <- tolower(dlgInput(message="Elige una letra: ")$res)
+
+  if (grepl(intento, palabra)) {
+    print("¡Muy bien!")
+
+    # Actualizamos la variable 'adivinar' con la letra adivinada
+    posiciones <- which(strsplit(palabra, "")[[1]] == intento)
+    for (pos in posiciones) {
+      adivinar[pos] <- intento
+    }
+
+    # Verificamos si todas las letras han sido adivinadas
+    if (!("_" %in% adivinar)) {
+      print("¡Ganaste! Has adivinado la palabra.")
+      break
+    }
+  } else {
+    cantidad_de_intentos <- cantidad_de_intentos - 1
+    if (cantidad_de_intentos == 0) {
+      print("¡Perdiste! Más suerte la próxima ;)")
+    } else {
+      print(paste("Lo lamento, intentá de nuevo. Te quedan", cantidad_de_intentos, "intentos"))
+    }
+  }
+}
+
+# Mostramos la palabra correcta al final
+print(paste("La palabra era:", palabra))
+```
+
